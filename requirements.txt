@@ -1,4 +1,5 @@
 langchain
+langchain_community
 PyPDF2
 python-dotenv
 faiss-cpu
