@@ -1,6 +1,7 @@
 openai
 langchain
 langchain-community
+langchain-huggingface
 PyPDF2
 python-dotenv
 faiss-cpu
