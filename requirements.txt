@@ -7,3 +7,4 @@ python-dotenv
 faiss-cpu
 altair<5
 streamlit
+python-dotenv

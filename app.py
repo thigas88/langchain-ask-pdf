@@ -7,7 +7,11 @@ from langchain.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
 from langchain.callbacks import get_openai_callback
+from dotenv import load_dotenv
 import os
+
+load_dotenv() 
+
 
 def main():
     load_dotenv()
@@ -42,8 +46,8 @@ def main():
       if user_question:
         docs = knowledge_base.similarity_search(user_question)
         
-        llm = OpenAI(apiKey=os.env.OPENAI_API_KEY,
-                     baseUrl=os.env.OPENAI_BASE_URL)
+        llm = OpenAI(apiKey=os.environ.get("OPENAI_API_KEY"),
+                     baseUrl=os.environ.get("OPENAI_BASE_URL"))
         chain = load_qa_chain(llm, chain_type="stuff")
         with get_openai_callback() as cb:
           response = chain.run(input_documents=docs, question=user_question)
