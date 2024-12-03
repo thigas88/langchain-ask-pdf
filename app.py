@@ -34,7 +34,7 @@ def main():
       chunks = text_splitter.split_text(text)
       
       # create embeddings
-      embeddings = OpenAIEmbeddings()
+      embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
       knowledge_base = FAISS.from_texts(chunks, embeddings)
       
       # show user input
