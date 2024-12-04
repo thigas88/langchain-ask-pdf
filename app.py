@@ -3,9 +3,13 @@ import streamlit as st
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import ChatHuggingFace
+from langchain_huggingface import HuggingFaceEndpoint
+from langchain.document_loaders import PyPDFLoader
 from langchain.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
+from langchain_community.chat_models.openai import ChatOpenAI
 from langchain.callbacks import get_openai_callback
 from dotenv import load_dotenv
 import os
@@ -27,6 +31,9 @@ def main():
       text = ""
       for page in pdf_reader.pages:
         text += page.extract_text()
+
+      # loader = PyPDFLoader("mp-wallet_20241109153202_8f05.pdf")
+      # document_pdf = loader.load()
         
       # split into chunks
       text_splitter = CharacterTextSplitter(
@@ -42,13 +49,19 @@ def main():
       knowledge_base = FAISS.from_texts(chunks, embeddings)
       
       # show user input
-      user_question = st.text_input("Ask a question about your PDF:")
+      user_question = st.text_input("Faça uma pergunta sobre seu PDF:")
       if user_question:
         documents = knowledge_base.similarity_search(user_question)
-        
-        llm = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"),
-                     base_url=os.environ.get("OPENAI_BASE_URL"))
+        docs_content = "\n\n".join(doc.page_content for doc in documents)
+
+        llm = ChatOpenAI(
+            model_name="Qwen/Qwen2.5-72B-Instruct",
+            openai_api_key=os.environ["OPENAI_API_KEY"],
+            openai_api_base=os.environ["OPENAI_BASE_URL"],
+        )
         chain = load_qa_chain(llm, chain_type="stuff")
+        # llm.invoke("Why is open-source software important?")
+       
         with get_openai_callback() as cb:
           input_data = {
               'input_documents': documents,
@@ -59,8 +72,8 @@ def main():
            
         st.write(response)
 
-        for chunk in chain.stream(response):
-          print(chunk)
+        # for chunk in chain.stream(response):
+        #   print(chunk)
     
 
 if __name__ == '__main__':
