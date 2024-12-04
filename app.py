@@ -59,7 +59,7 @@ def main():
            
         st.write(response)
 
-        for chunk in chain.stream(documents):
+        for chunk in chain.stream(response):
           print(chunk)
     
 
