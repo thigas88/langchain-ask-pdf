@@ -50,7 +50,11 @@ def main():
                      base_url=os.environ.get("OPENAI_BASE_URL"))
         chain = load_qa_chain(llm, chain_type="stuff")
         with get_openai_callback() as cb:
-          response = chain.invoke(input_documents=documents, question=user_question)
+          input_data = {
+              'input_documents': documents,
+              'question': user_question,
+          }
+          response = chain.invoke(input=input_data)
           print(cb)
            
         st.write(response)
