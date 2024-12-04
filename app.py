@@ -44,16 +44,19 @@ def main():
       # show user input
       user_question = st.text_input("Ask a question about your PDF:")
       if user_question:
-        docs = knowledge_base.similarity_search(user_question)
+        documents = knowledge_base.similarity_search(user_question)
         
-        llm = OpenAI(apiKey=os.environ.get("OPENAI_API_KEY"),
-                     baseUrl=os.environ.get("OPENAI_BASE_URL"))
+        llm = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"),
+                     base_url=os.environ.get("OPENAI_BASE_URL"))
         chain = load_qa_chain(llm, chain_type="stuff")
         with get_openai_callback() as cb:
-          response = chain.run(input_documents=docs, question=user_question)
+          response = chain.invoke(input_documents=documents, question=user_question)
           print(cb)
            
         st.write(response)
+
+        for chunk in chain.stream(documents):
+          print(chunk)
     
 
 if __name__ == '__main__':
